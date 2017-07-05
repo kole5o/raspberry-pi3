@@ -1,0 +1,55 @@
+driver source
+https://github.com/skyrocknroll/CH341SER_LINUX
+
+link to zipped Makefile README.md ch34x.c
+https://github.com/skyrocknroll/CH341SER_LINUX/archive/master.zip
+
+patching source
+http://mintlinux.ru/forum/thread12636.html
+
+
+1. sudo apt-get source linux-source-3.19.0 linux-headers-$(uname -r)
+2. cd /tmp
+3. tar -xjf /usr/src/linux-source-3.19.0.tar.bz2
+4. cd /usr/src/linux-headers-3.19.0-32/
+5. make oldconfig
+6. make prepare
+7. make scripts
+8. cp -v /usr/src/linux-headers-$(uname -r)/Module.symvers .
+9. cp /lib/modules/$(uname -r)/kernel/drivers/usb/serial/ch341.ko /lib/modules/$(uname -r)/kernel/drivers/usb/serial/ch341.ko.orig
+10. cd drivers/usb/serial
+11. cp ch341.c ch341.c.orig
+12. wget https://github.com/karlp/ch341-linux/raw/master/0001-usb-serial-ch341-Add-parity-support.patch
+13. cat 0001-usb-serial-ch341-Add-parity-support.patch | patch -p4
+14. patching file ch341.c
+15. Hunk #1 succeeded at 349 (offset 3 lines).
+16. Hunk #2 succeeded at 370 (offset 3 lines).
+17. make -C /lib/modules/$(uname -r)/build M=$(pwd) modules
+18. sudo cp ch341.ko /lib/modules/$(uname -r)/kernel/drivers/usb/serial/ch341.ko
+19. sudo rmmod ch341
+20. sudo modprobe ch341
+
+
+how i make it
+first install everything nedeed for make
+
+cd /tmp
+wget https://github.com/skyrocknroll/CH341SER_LINUX/archive/master.zip
+unzip here
+cp /lib/modules/$(uname -r)/kernel/drivers/usb/serial/ch341.ko /lib/modules/$(uname -r)/kernel/drivers/usb/serial/ch341.ko.orig
+cp ch341.c ch341.c.orig
+wget https://github.com/karlp/ch341-linux/raw/master/0001-usb-serial-ch341-Add-parity-support.patch
+cat 0001-usb-serial-ch341-Add-parity-support.patch | patch -p4
+patching file ch341.c
+Hunk #1 succeeded at 349 (offset 3 lines).
+Hunk #2 succeeded at 370 (offset 3 lines).
+make -C /lib/modules/$(uname -r)/build M=$(pwd) modules
+sudo cp ch341.ko /lib/modules/$(uname -r)/kernel/drivers/usb/serial/ch341.ko
+sudo rmmod ch341
+sudo modprobe ch341
+
+it work on raspbian jessie 4.4.9
+
+pathed version
+ch341-4.9.28.ko
+rename it to ch341.ko then replace original module in /lib/modules/$(uname -r)/kernel/drivers/usb/serial/
